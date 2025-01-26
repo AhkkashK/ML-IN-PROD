@@ -8,7 +8,7 @@ on:
     branches:
       - develop
       - staging
-      - production
+      - main
 
 jobs:
   integration-tests:
@@ -29,6 +29,16 @@ jobs:
         run: |
           docker-compose run --rm backend pytest /tests/integration_test.py
 
+      - name: Merge develop into staging
+        if: success()  # Cette étape se déclenche uniquement si les tests passent
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git fetch origin
+          git checkout staging
+          git merge origin/develop --no-ff --commit -m "CI: Merge develop into staging after integration tests"
+          git push origin staging
+
   staging-tests:
     if: github.ref == 'refs/heads/staging'
     runs-on: ubuntu-latest
@@ -41,7 +51,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y docker-compose
-          docker-compose version  # Vérification que docker-compose est installé
+          docker-compose version  
 
       - name: Start services with Docker Compose
         run: |
@@ -53,7 +63,7 @@ jobs:
 
       - name: Run unit tests
         run: |
-          docker-compose exec backend pytest /app/tests/unit_test.py
+          docker-compose exec backend pytest /tests/unit_test.py
 
       - name: Run Cypress end-to-end tests
         run: |
