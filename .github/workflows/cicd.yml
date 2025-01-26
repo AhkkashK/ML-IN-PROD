@@ -30,7 +30,7 @@ jobs:
           docker-compose run --rm backend pytest /tests/integration_test.py
 
       - name: Merge develop into staging
-        if: success()  # Cette étape se déclenche uniquement si les tests passent
+        if: success()  
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
