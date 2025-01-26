@@ -12,7 +12,7 @@ on:
 
 jobs:
   integration-tests:
-    if: ${{ github.event_name == 'pull_request' && github.base_ref == 'develop' }}
+    if: github.event_name == 'pull_request' && github.base_ref == 'develop'
     runs-on: ubuntu-latest
 
     steps:
@@ -23,8 +23,44 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y docker-compose
-          docker-compose version
+          docker-compose version  # Vérification que docker-compose est installé
 
       - name: Run integration tests
         run: |
-          docker-compose run --rm backend pytest /tests/integration_test.py
+          docker-compose --env-file .env run --rm backend pytest /app/tests/integration_test.py
+
+  staging-tests:
+    if: github.ref == 'refs/heads/staging'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
+          docker-compose version  # Vérification que docker-compose est installé
+
+      - name: Start services with Docker Compose
+        run: |
+          docker-compose up -d
+
+      - name: Wait for services to be ready
+        run: |
+          npx wait-on http://localhost:3000 http://localhost:8000
+
+      - name: Run unit tests
+        run: |
+          docker-compose exec backend pytest /app/tests/unit_test.py
+
+      - name: Run Cypress end-to-end tests
+        run: |
+          cd tests/cypress
+          npx cypress run
+
+      - name: Stop services
+        if: always()
+        run: |
+          docker-compose down
