@@ -42,7 +42,7 @@ jobs:
   staging-tests:
     runs-on: ubuntu-latest
     needs: integration-tests 
-    if: ${{ always() }}  # Toujours exécuter après les tests d'intégration
+    if: ${{ always() }}  
 
     steps:
       - name: Checkout code
