@@ -2,7 +2,7 @@ const { defineConfig } = require("cypress");
 
 module.exports = defineConfig({
   e2e: {
-    baseUrl: 'http://localhost:3000', // L'URL de base pour vos tests
+    baseUrl: 'http://localhost:3000',
     setupNodeEvents(on, config) {
     },
   },
