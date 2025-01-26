@@ -23,11 +23,10 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y docker-compose
-          docker-compose version  # Verify docker-compose is installed
 
       - name: Run integration tests
         run: |
-          docker-compose run --rm backend pytest /tests/integration_test.py
+          docker-compose run --rm backend pytest tests/integration_test.py  # Correct path
 
       - name: Merge develop into staging
         if: success()
@@ -52,12 +51,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y docker-compose
-          docker-compose version
-
-      - name: Install GPU dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libgbm-dev libnss3 x11-utils
 
       - name: Start services with Docker Compose
         run: |
@@ -67,18 +60,17 @@ jobs:
         run: |
           npx wait-on http://localhost:3000
 
-      - name: List Cypress Files
+      - name: Installer les dépendances Node.js
         run: |
-          echo "Listing all files in the Cypress directory:"
-          ls -R tests/cypress
-
+          npm install
 
       - name: Run Cypress end-to-end tests
         uses: cypress-io/github-action@v5
         with:
-          spec: tests/cypress/e2e/**/*.cy.js # Match all spec files in the e2e folder
-          config-file: tests/cypress.config.js
+          spec: tests/cypress/e2e/test.cy.js  # Chemin corrigé basé sur la capture d'écran
+          config-file: tests/cypress.config.js  # Chemin corrigé basé sur la capture d'écran
           browser: chrome
+          skip-install: true  # Ignore l'installation par Cypress
 
       - name: Stop services
         if: always()
