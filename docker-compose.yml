@@ -3,15 +3,15 @@ version: "3.9"
 services:
   backend:
     build:
-      context: ./backend
-    environment:
-      - PYTHONPATH=/app  # Configure PYTHONPATH
-      - NLTK_DATA=/usr/share/nltk_data  # Inclut les données NLTK
+      context: .
+      dockerfile: ./backend/Dockerfile
     ports:
       - "8000:8000"
     volumes:
-      - ./backend:/app
-      - ./tests:/app/tests
+      - ./backend:/app  # Monte le backend dans /app
+      - ./tests:/app/tests  # Monte les tests dans /app/tests
+    environment:
+      - PYTHONPATH=/app  # Définit le chemin Python pour trouver les modules
 
   frontend:
     build:
@@ -19,5 +19,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./frontend:/app
-      - /app/node_modules
+      - ./frontend:/app  # Monte le code frontend dans /app
+      - /app/node_modules  # Monte les dépendances Node.js
+    environment:
+      - CI=true  # Active le mode CI pour Cypress et autres outils
