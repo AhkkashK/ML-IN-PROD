@@ -1,0 +1,118 @@
+name: CI/CD Pipeline
+
+on:
+  pull_request:
+    branches:
+      - develop
+  push:
+    branches:
+      - develop
+      - staging
+      - main
+
+jobs:
+  # Build and test on pull request to develop
+  build_and_test_on_pr:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.base_ref == 'develop'
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build Docker image for backend
+        run: docker build -t backend:latest ./backend
+
+      - name: Run integration tests
+        run: |
+          pytest tests/integration_test.py --maxfail=5 --disable-warnings -q
+
+      - name: Run unit tests
+        run: |
+          pytest tests/unit_test.py --maxfail=5 --disable-warnings -q
+
+  # Push to staging when there's a push to develop
+  push_to_staging:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop'
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Push to staging branch
+        run: |
+          git checkout staging
+          git merge develop
+          git push origin staging
+
+  # Build and test on push to staging
+  build_and_test_on_staging:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/staging'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build Docker image for backend
+        run: docker build -t backend:latest ./backend
+
+      - name: Run integration tests
+        run: |
+          pytest tests/integration_test.py --maxfail=5 --disable-warnings -q
+
+      - name: Run unit tests
+        run: |
+          pytest tests/unit_test.py --maxfail=5 --disable-warnings -q
+
+      - name: Start the app with Docker (for Cypress tests)
+        run: docker-compose -f docker-compose.yml up -d
+
+      - name: Wait for the app to fully start (2 minutes)
+        run: sleep 120
+
+      - name: Run Cypress tests
+        run: npx cypress run --config-file tests/cypress/cypress.config.js
+
+      - name: Stop the app after tests
+        run: docker-compose -f docker-compose.yml down
+
+      - name: Push to production (main) branch if tests pass
+        run: |
+          git checkout main
+          git merge staging
+          git push origin main
+
+  # Build Docker images and deploy to production
+  build_and_deploy_to_production:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Build Docker images
+        run: |
+          docker build -t backend:latest ./backend
+          docker build -t frontend:latest ./frontend
+
+      - name: Push Docker images to DockerHub
+        run: |
+          docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+          docker tag backend:latest $DOCKER_USERNAME/backend:latest
+          docker tag frontend:latest $DOCKER_USERNAME/frontend:latest
+          docker push $DOCKER_USERNAME/backend:latest
+          docker push $DOCKER_USERNAME/frontend:latest
+
+      - name: Deploy to production
+        run: |
+          # Add commands to deploy the app to production (e.g., push to a Kubernetes cluster or cloud service)
+          echo "Deploying to production..."
