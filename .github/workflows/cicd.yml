@@ -73,7 +73,7 @@ jobs:
       - name: Run Cypress end-to-end tests
         uses: cypress-io/github-action@v5
         with:
-          spec: tests/cypress/e2e/test.cy.js # Chemin des fichiers de test
+          spec: tests/cypress/e2e/**/*.cy.js # Chemin des fichiers de test
           config-file: tests/cypress.config.js # Fichier de configuration Cypress
           browser: chrome # Navigateur utilisé (par défaut : electron)
 
