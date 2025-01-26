@@ -60,7 +60,7 @@ jobs:
 
       - name: Run unit tests
         run: |
-          docker-compose exec backend pytest /tests/unit_test.py
+          docker-compose exec -T backend pytest /tests/unit_test.py
 
       - name: Run Cypress end-to-end tests
         run: |
