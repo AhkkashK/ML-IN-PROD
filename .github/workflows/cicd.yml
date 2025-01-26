@@ -23,7 +23,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y docker-compose
-          docker-compose version  # Vérification que docker-compose est installé
+          docker-compose version  # Verify docker-compose is installed
 
       - name: Run integration tests
         run: |
@@ -52,7 +52,12 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y docker-compose
-          docker-compose version  
+          docker-compose version
+
+      - name: Install GPU dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgbm-dev libnss3 x11-utils
 
       - name: Start services with Docker Compose
         run: |
@@ -62,20 +67,25 @@ jobs:
         run: |
           npx wait-on http://localhost:3000
 
-      - name: Run unit tests
+      - name: List Cypress Files
         run: |
-          docker-compose exec -T backend pytest /tests/unit_test.py
-          
-      - name: Install Cypress
+          echo "Listing all files in the Cypress directory:"
+          ls -R tests/cypress
+
+      - name: Install Node.js dependencies
         run: |
-          npm install cypress --save-dev
+          npm ci
+
+      - name: Verify Cypress Installation
+        run: |
+          npx cypress verify
 
       - name: Run Cypress end-to-end tests
         uses: cypress-io/github-action@v5
         with:
-          spec: tests/cypress/e2e/**/*.cy.js # Chemin des fichiers de test
-          config-file: tests/cypress.config.js # Fichier de configuration Cypress
-          browser: chrome # Navigateur utilisé (par défaut : electron)
+          spec: tests/cypress/e2e/**/*.cy.js # Match all spec files in the e2e folder
+          config-file: tests/cypress/cypress.config.js
+          browser: chrome
 
       - name: Stop services
         if: always()
