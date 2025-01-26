@@ -19,20 +19,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.8'
-
-      - name: Install Docker and Docker Compose
+      - name: Install Docker Compose
         run: |
           sudo apt-get update
-          sudo apt-get install -y docker.io
-          sudo curl -L "https://github.com/docker/compose/releases/download/v2.20.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-          sudo chmod +x /usr/local/bin/docker-compose
-          docker-compose --version  # Vérification que docker-compose est bien installé
+          sudo apt-get install -y docker-compose
+          docker-compose version  # Vérification que docker-compose est installé
 
-      - name: Build and run integration tests
+      - name: Run integration tests
         run: |
           docker-compose --env-file .env run --rm backend pytest /app/tests/integration_test.py
 
@@ -44,13 +37,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install Docker and Docker Compose
+      - name: Install Docker Compose
         run: |
           sudo apt-get update
-          sudo apt-get install -y docker.io
-          sudo curl -L "https://github.com/docker/compose/releases/download/v2.20.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-          sudo chmod +x /usr/local/bin/docker-compose
-          docker-compose --version  # Vérification que docker-compose est bien installé
+          sudo apt-get install -y docker-compose
+          docker-compose version  # Vérification que docker-compose est installé
 
       - name: Start services with Docker Compose
         run: |
@@ -73,34 +64,3 @@ jobs:
         if: always()
         run: |
           docker-compose down
-
-  build-and-deploy:
-    if: github.ref == 'refs/heads/production'
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Install Docker and Docker Compose
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y docker.io
-          sudo curl -L "https://github.com/docker/compose/releases/download/v2.20.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-          sudo chmod +x /usr/local/bin/docker-compose
-          docker-compose --version  # Vérification que docker-compose est bien installé
-
-      - name: Login to DockerHub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Build and push Docker images
-        run: |
-          docker build -t my-app-backend:latest ./backend
-          docker build -t my-app-frontend:latest ./frontend
-          docker tag my-app-backend:latest ${{ secrets.DOCKER_USERNAME }}/my-app-backend:latest
-          docker tag my-app-frontend:latest ${{ secrets.DOCKER_USERNAME }}/my-app-frontend:latest
-          docker push ${{ secrets.DOCKER_USERNAME }}/my-app-backend:latest
-          docker push ${{ secrets.DOCKER_USERNAME }}/my-app-frontend:latest
