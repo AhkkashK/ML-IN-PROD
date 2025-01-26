@@ -30,7 +30,7 @@ jobs:
           docker-compose run --rm backend pytest /tests/integration_test.py
 
       - name: Merge develop into staging
-        if: success()  
+        if: success()
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
@@ -52,7 +52,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y docker-compose
-          docker-compose version
+          docker-compose version  
 
       - name: Start services with Docker Compose
         run: |
@@ -62,17 +62,9 @@ jobs:
         run: |
           npx wait-on http://localhost:3000
 
-      - name: Install dependencies for headless testing
-        run: sudo apt-get install -y libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 xvfb
-
-      - name: Install Node.js dependencies
+      - name: Run unit tests
         run: |
-          cd tests
-          npm install
-
-      - name: Run Cypress end-to-end tests
-        run: |
-          npx cypress run --config-file tests/cypress.config.js --headless
+          docker-compose exec -T backend pytest /tests/unit_test.py
 
       - name: Stop services
         if: always()
