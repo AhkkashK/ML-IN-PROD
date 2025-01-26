@@ -50,6 +50,10 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y docker-compose
           docker-compose version
+
+      - name: Install dependencies
+        run: npm install cypress 
+        
       - name: Install GPU dependencies
         run: |
           sudo apt-get update
