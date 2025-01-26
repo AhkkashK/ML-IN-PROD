@@ -53,25 +53,28 @@ jobs:
 
       - name: Install dependencies
         run: npm install cypress 
-        
+
       - name: Install GPU dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y libgbm-dev libnss3 x11-utils
+
       - name: Start services with Docker Compose
         run: |
           docker-compose up -d
       - name: Wait for backend to be ready
         run: |
           npx wait-on http://localhost:3000
+
       - name: List Cypress Files
         run: |
           echo "Listing all files in the Cypress directory:"
           ls -R tests/cypress
+
       - name: Run Cypress end-to-end tests
         uses: cypress-io/github-action@v5
         with:
-          spec: tests/cypress/e2e/**/*.cy.js # Match all spec files in the e2e folder
+          spec: tests/cypress/e2e/**/*.cy.js 
           config-file: tests/cypress.config.js
           browser: chrome
 
@@ -79,3 +82,13 @@ jobs:
         if: always()
         run: |
           docker-compose down
+      
+      - name: Merge staging into main
+        if: success()
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git fetch origin
+          git checkout main
+          git merge origin/staging --no-ff --commit -m "CI: Merge staging into main after unit and E2E tests"
+          git push origin main
