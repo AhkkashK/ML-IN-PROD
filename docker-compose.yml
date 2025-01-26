@@ -3,23 +3,21 @@ version: "3.9"
 services:
   backend:
     build:
-      context: .
-      dockerfile: ./backend/Dockerfile
+      context: ./backend
+    environment:
+      - PYTHONPATH=/app  # Configure PYTHONPATH
+      - NLTK_DATA=/usr/share/nltk_data  # Inclut les données NLTK
     ports:
       - "8000:8000"
     volumes:
       - ./backend:/app
-      - ./tests:/app/tests  # Monte les tests pour le backend
-    environment:
-      - PYTHONPATH=/app
+      - ./tests:/app/tests
 
   frontend:
     build:
-      context: ./frontend  # Le contexte reste limité au frontend
+      context: ./frontend
     ports:
       - "3000:3000"
     volumes:
       - ./frontend:/app
-      - /app/node_modules  # Monte les dépendances Node.js
-    environment:
-      - CI=true  # Prépare le mode CI pour les tests frontend
+      - /app/node_modules

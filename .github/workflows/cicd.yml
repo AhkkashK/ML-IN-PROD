@@ -23,26 +23,11 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y docker-compose
-          docker-compose version
-
-      - name: Build and Start Services
-        run: |
-          docker-compose up -d --build
-
-      - name: Debug volume mounting
-        run: |
-          docker-compose run --rm backend ls /app
+          docker-compose version  # Vérification que docker-compose est installé
 
       - name: Run integration tests
-        env:
-          PYTHONPATH: /app
         run: |
-          docker-compose run --rm backend pytest /app/tests/integration_test.py
-
-      - name: Stop services
-        if: always()
-        run: |
-          docker-compose down --remove-orphans
+          docker-compose --env-file .env run --rm backend pytest /app/tests/integration_test.py
 
   staging-tests:
     if: github.ref == 'refs/heads/staging'
@@ -56,29 +41,26 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y docker-compose
-          docker-compose version
+          docker-compose version  # Vérification que docker-compose est installé
 
-      - name: Build and Start Services
+      - name: Start services with Docker Compose
         run: |
-          docker-compose up -d --build
+          docker-compose up -d
 
-      - name: Wait for Services to be Ready
+      - name: Wait for services to be ready
         run: |
           npx wait-on http://localhost:3000 http://localhost:8000
 
-      - name: Run Backend Unit Tests
-        env:
-          PYTHONPATH: /app
+      - name: Run unit tests
         run: |
           docker-compose exec backend pytest /app/tests/unit_test.py
 
-      - name: Run Frontend E2E Tests
+      - name: Run Cypress end-to-end tests
         run: |
-          docker-compose exec frontend npx cypress run
+          cd tests/cypress
+          npx cypress run
 
       - name: Stop services
         if: always()
         run: |
-          docker-compose down --remove-orphans
-
- 
+          docker-compose down

@@ -2,21 +2,24 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
-# Copy and install dependances
+# Copy and install dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# PATH
-ENV NLTK_DATA /nltk_data/ ADD . $NLTK_DATA
-# Loads files
-RUN python -m nltk.downloader punkt -d /usr/share/nltk_data
-RUN python -m nltk.downloader stopwords -d /usr/share/nltk_data
-RUN python -m nltk.downloader punkt_tab -d /usr/share/nltk_data
-# COPY source code
+# Configure NLTK Data
+ENV NLTK_DATA=/usr/share/nltk_data
+RUN python -m nltk.downloader punkt -d $NLTK_DATA
+RUN python -m nltk.downloader stopwords -d $NLTK_DATA
+RUN python -m nltk.downloader punkt_tab -d $NLTK_DATA
+
+# Add PYTHONPATH for proper module resolution
+ENV PYTHONPATH=/app
+
+# Copy source code
 COPY . .
 
-# Port FastAPI
+# Expose FastAPI port
 EXPOSE 8000
 
-# Start FastApi server with unicorn 
+# Start FastAPI server with uvicorn
 CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
