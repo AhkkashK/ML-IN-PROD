@@ -5,19 +5,16 @@ services:
     build:
       context: ./backend
     ports:
-      - "8000:8000"
+      - "8000:8000"  
     volumes:
       - ./backend:/app  
       - ./tests:/app/tests
-    environment:
-      - PYTHONPATH=/app  
-    working_dir: /app  
-
+    
   frontend:
     build:
       context: ./frontend
     ports:
-      - "3000:3000"
+      - "3000:3000" 
     volumes:
       - ./frontend:/app  
-      - /app/node_modules
+      - /app/node_modules  
