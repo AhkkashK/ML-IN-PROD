@@ -72,19 +72,12 @@ jobs:
           echo "Listing all files in the Cypress directory:"
           ls -R tests/cypress
 
-      - name: Install Node.js dependencies
-        run: |
-          npm ci
-
-      - name: Verify Cypress Installation
-        run: |
-          npx cypress verify
 
       - name: Run Cypress end-to-end tests
         uses: cypress-io/github-action@v5
         with:
           spec: tests/cypress/e2e/**/*.cy.js # Match all spec files in the e2e folder
-          config-file: tests/cypress/cypress.config.js
+          config-file: tests/cypress.config.js
           browser: chrome
 
       - name: Stop services
