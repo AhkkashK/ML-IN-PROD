@@ -3,16 +3,16 @@ name: CI/CD Pipeline
 on:
   pull_request:
     branches:
-      - dev
+      - develop
   push:
     branches:
-      - dev
+      - develop
       - staging
       - production
 
 jobs:
   integration-tests:
-    if: github.event_name == 'pull_request' && github.base_ref == 'dev'
+    if: github.event_name == 'pull_request' && github.base_ref == 'develop'
     runs-on: ubuntu-latest
 
     steps:
