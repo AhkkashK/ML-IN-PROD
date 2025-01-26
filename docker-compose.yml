@@ -7,11 +7,9 @@ services:
     ports:
       - "8000:8000"  
     volumes:
-      - ./backend:/app 
-      - ./tests:/tests
-
-    environment:
-      - PYTHONPATH=/app 
+      - ./backend:/backend 
+      - ./tests:/app/tests
+    
   frontend:
     build:
       context: ./frontend
