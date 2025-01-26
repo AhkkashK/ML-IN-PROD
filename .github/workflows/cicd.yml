@@ -23,15 +23,11 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y docker-compose
-          docker-compose version  # Vérification que docker-compose est installé
-
-      - name: Debug paths (optional)
-        run: |
-          docker-compose run --rm backend bash -c "echo $PYTHONPATH && ls -R /app"
+          docker-compose version  # Vérifie que Docker Compose est bien installé
 
       - name: Run integration tests
         run: |
-          docker-compose run --rm backend bash -c "PYTHONPATH=/app pytest /app/tests/integration_test.py"
+          docker-compose run --rm backend pytest /app/tests/integration_test.py
 
   staging-tests:
     if: github.ref == 'refs/heads/staging'
@@ -45,7 +41,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y docker-compose
-          docker-compose version  # Vérification que docker-compose est installé
+          docker-compose version  # Vérifie que Docker Compose est bien installé
 
       - name: Start services with Docker Compose
         run: |
@@ -57,7 +53,7 @@ jobs:
 
       - name: Run unit tests
         run: |
-          docker-compose exec backend bash -c "PYTHONPATH=/app pytest /app/tests/unit_test.py"
+          docker-compose exec backend pytest /app/tests/unit_test.py
 
       - name: Run Cypress end-to-end tests
         run: |
@@ -68,3 +64,21 @@ jobs:
         if: always()
         run: |
           docker-compose down
+
+  production-deployment:
+    if: github.ref == 'refs/heads/production'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
+          docker-compose version  # Vérifie que Docker Compose est bien installé
+
+      - name: Deploy to production
+        run: |
+          docker-compose -f docker-compose.prod.yml up -d
