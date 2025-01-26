@@ -65,11 +65,11 @@ jobs:
       - name: Run unit tests
         run: |
           docker-compose exec -T backend pytest /tests/unit_test.py
-
+      
       - name: Run Cypress end-to-end tests
         run: |
           cd tests/cypress
-          npx cypress run --config-file tests/cypress.config.js --headless
+          npx cypress run --config-file /tests/cypress.config.js --headless
 
       - name: Stop services
         if: always()
