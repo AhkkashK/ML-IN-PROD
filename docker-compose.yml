@@ -3,18 +3,23 @@ version: "3.9"
 services:
   backend:
     build:
-      context: ./backend
+      context: .
+      dockerfile: ./backend/Dockerfile
     ports:
-      - "8000:8000"  
+      - "8000:8000"
     volumes:
-      - ./backend:/app 
+      - ./backend:/app
+      - ./tests:/app/tests  # Monte les tests pour le backend
     environment:
-      - PYTHONPATH=/app 
+      - PYTHONPATH=/app
+
   frontend:
     build:
-      context: ./frontend
+      context: ./frontend  # Le contexte reste limité au frontend
     ports:
-      - "3000:3000" 
+      - "3000:3000"
     volumes:
-      - ./frontend:/app  
-      - /app/node_modules  
+      - ./frontend:/app
+      - /app/node_modules  # Monte les dépendances Node.js
+    environment:
+      - CI=true  # Prépare le mode CI pour les tests frontend

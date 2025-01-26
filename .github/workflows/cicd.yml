@@ -43,3 +43,42 @@ jobs:
         if: always()
         run: |
           docker-compose down --remove-orphans
+
+  staging-tests:
+    if: github.ref == 'refs/heads/staging'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
+          docker-compose version
+
+      - name: Build and Start Services
+        run: |
+          docker-compose up -d --build
+
+      - name: Wait for Services to be Ready
+        run: |
+          npx wait-on http://localhost:3000 http://localhost:8000
+
+      - name: Run Backend Unit Tests
+        env:
+          PYTHONPATH: /app
+        run: |
+          docker-compose exec backend pytest /app/tests/unit_test.py
+
+      - name: Run Frontend E2E Tests
+        run: |
+          docker-compose exec frontend npx cypress run
+
+      - name: Stop services
+        if: always()
+        run: |
+          docker-compose down --remove-orphans
+
+ 
