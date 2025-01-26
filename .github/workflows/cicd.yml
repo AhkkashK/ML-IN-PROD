@@ -73,7 +73,7 @@ jobs:
 
       - name: Run Cypress end-to-end tests
         run: |
-          npx cypress run --config-file /tests/cypress.config.js --headless
+          npx cypress run --config-file tests/cypress.config.js --headless
 
       - name: Stop services
         if: always()
