@@ -26,11 +26,11 @@ jobs:
           docker-compose version 
 
       - name: Debug: List test files
-        run: docker-compose run --rm backend ls -R /app/../tests
+        run: docker-compose run --rm backend ls -R /tests
 
       - name: Run integration tests
         run: |
-          docker-compose run --rm backend pytest /app/../tests/integration_test.py
+          docker-compose run --rm backend pytest /tests/integration_test.py
 
   staging-tests:
     if: github.ref == 'refs/heads/staging'
@@ -56,7 +56,7 @@ jobs:
 
       - name: Run unit tests
         run: |
-          docker-compose exec backend pytest /app/../tests/unit_test.py
+          docker-compose exec backend pytest /tests/unit_test.py
 
       - name: Run Cypress end-to-end tests
         run: |
