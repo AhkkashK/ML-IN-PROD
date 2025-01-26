@@ -27,19 +27,22 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y docker-compose
 
+      - name: Verify Docker Compose Installation
+        run: docker-compose --version
+
       - name: Build Docker images
-        env: 
+        env:
           MLFLOW_TRACKING_USERNAME: ${{ secrets.MLFLOW_TRACKING_USERNAME }}
           MLFLOW_TRACKING_PASSWORD: ${{ secrets.MLFLOW_TRACKING_PASSWORD }}
         run: |
-          docker-compose -f docker-compose.yml build backend
+          docker-compose --env-file /dev/null -f docker-compose.yml build backend
 
       - name: Run backend tests
         env:
           MLFLOW_TRACKING_USERNAME: ${{ secrets.MLFLOW_TRACKING_USERNAME }}
           MLFLOW_TRACKING_PASSWORD: ${{ secrets.MLFLOW_TRACKING_PASSWORD }}
         run: |
-          docker-compose run --rm backend pytest tests/integration_test.py
+          docker-compose --env-file /dev/null run --rm backend pytest tests/integration_test.py
 
   staging-tests:
     if: github.ref == 'refs/heads/staging'
@@ -58,26 +61,26 @@ jobs:
           sudo apt-get install -y docker-compose
 
       - name: Build and Start Services
-        env: 
+        env:
           MLFLOW_TRACKING_USERNAME: ${{ secrets.MLFLOW_TRACKING_USERNAME }}
           MLFLOW_TRACKING_PASSWORD: ${{ secrets.MLFLOW_TRACKING_PASSWORD }}
         run: |
-          docker-compose -f docker-compose.yml up -d
+          docker-compose --env-file /dev/null -f docker-compose.yml up -d
 
       - name: Wait for services to be ready
         run: |
           npx wait-on http://localhost:3000 http://localhost:8000
 
       - name: Run backend unit tests
-        env: 
+        env:
           MLFLOW_TRACKING_USERNAME: ${{ secrets.MLFLOW_TRACKING_USERNAME }}
           MLFLOW_TRACKING_PASSWORD: ${{ secrets.MLFLOW_TRACKING_PASSWORD }}
         run: |
-          docker-compose run --rm backend pytest tests/unit_test.py
+          docker-compose --env-file /dev/null run --rm backend pytest tests/unit_test.py
 
       - name: Run Cypress end-to-end tests
         run: |
-          docker-compose run --rm frontend npx cypress run
+          docker-compose --env-file /dev/null run --rm frontend npx cypress run
 
       - name: Stop services
         if: always()
@@ -101,11 +104,11 @@ jobs:
           sudo apt-get install -y docker-compose
 
       - name: Build Docker images
-        env: 
+        env:
           MLFLOW_TRACKING_USERNAME: ${{ secrets.MLFLOW_TRACKING_USERNAME }}
           MLFLOW_TRACKING_PASSWORD: ${{ secrets.MLFLOW_TRACKING_PASSWORD }}
         run: |
-          docker-compose -f docker-compose.yml build
+          docker-compose --env-file /dev/null -f docker-compose.yml build
 
       - name: Push Docker images to DockerHub
         run: |
