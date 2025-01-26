@@ -66,14 +66,12 @@ jobs:
         run: |
           docker-compose exec -T backend pytest /tests/unit_test.py
 
-      - name: Install Cypress dependencies
-        run: |
-          cd tests
-          npm install cypress
-
       - name: Run Cypress end-to-end tests
-        run: |
-          npx cypress run --config-file tests/cypress.config.js --headless
+        uses: cypress-io/github-action@v5
+        with:
+          spec: 'tests/cypress/e2e/**/*.cy.js' # Chemin des fichiers de test
+          config-file: tests/cypress.config.js # Fichier de configuration Cypress
+          browser: chrome # Navigateur utilisé (par défaut : electron)
 
       - name: Stop services
         if: always()
