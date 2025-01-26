@@ -3,23 +3,19 @@ version: "3.9"
 services:
   backend:
     build:
-      context: .
-      dockerfile: ./backend/Dockerfile
+      context: ./backend
     ports:
-      - "8000:8000"
+      - "8000:8000"  
     volumes:
-      - ./backend:/app  # Monte le backend dans /app
-      - ./tests:/app/tests  # Monte les tests dans /app/tests
+      - ./backend:/app 
+        
     environment:
-      - PYTHONPATH=/app  # Définit le chemin Python pour trouver les modules
-
+      - PYTHONPATH=/app 
   frontend:
     build:
       context: ./frontend
     ports:
-      - "3000:3000"
+      - "3000:3000" 
     volumes:
-      - ./frontend:/app  # Monte le code frontend dans /app
-      - /app/node_modules  # Monte les dépendances Node.js
-    environment:
-      - CI=true  # Active le mode CI pour Cypress et autres outils
+      - ./frontend:/app  
+      - /app/node_modules  
