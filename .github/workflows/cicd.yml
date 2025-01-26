@@ -27,7 +27,7 @@ jobs:
 
       - name: Run integration tests
         run: |
-          docker-compose --env-file .env run --rm backend pytest /app/tests/integration_test.py
+          docker-compose run --rm backend pytest /app/tests/integration_test.py
 
   staging-tests:
     if: github.ref == 'refs/heads/staging'
