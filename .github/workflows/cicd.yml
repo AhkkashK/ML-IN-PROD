@@ -27,22 +27,23 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y docker-compose
 
-      - name: Verify Docker Compose Installation
-        run: docker-compose --version
+      - name: Create an empty .env file
+        run: |
+          touch .env
 
       - name: Build Docker images
         env:
           MLFLOW_TRACKING_USERNAME: ${{ secrets.MLFLOW_TRACKING_USERNAME }}
           MLFLOW_TRACKING_PASSWORD: ${{ secrets.MLFLOW_TRACKING_PASSWORD }}
         run: |
-          docker-compose --env-file /dev/null -f docker-compose.yml build backend
+          docker-compose --env-file .env -f docker-compose.yml build backend
 
       - name: Run backend tests
         env:
           MLFLOW_TRACKING_USERNAME: ${{ secrets.MLFLOW_TRACKING_USERNAME }}
           MLFLOW_TRACKING_PASSWORD: ${{ secrets.MLFLOW_TRACKING_PASSWORD }}
         run: |
-          docker-compose --env-file /dev/null run --rm backend pytest tests/integration_test.py
+          docker-compose --env-file .env run --rm backend pytest tests/integration_test.py
 
   staging-tests:
     if: github.ref == 'refs/heads/staging'
@@ -60,12 +61,16 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y docker-compose
 
+      - name: Create an empty .env file
+        run: |
+          touch .env
+
       - name: Build and Start Services
         env:
           MLFLOW_TRACKING_USERNAME: ${{ secrets.MLFLOW_TRACKING_USERNAME }}
           MLFLOW_TRACKING_PASSWORD: ${{ secrets.MLFLOW_TRACKING_PASSWORD }}
         run: |
-          docker-compose --env-file /dev/null -f docker-compose.yml up -d
+          docker-compose --env-file .env -f docker-compose.yml up -d
 
       - name: Wait for services to be ready
         run: |
@@ -76,11 +81,11 @@ jobs:
           MLFLOW_TRACKING_USERNAME: ${{ secrets.MLFLOW_TRACKING_USERNAME }}
           MLFLOW_TRACKING_PASSWORD: ${{ secrets.MLFLOW_TRACKING_PASSWORD }}
         run: |
-          docker-compose --env-file /dev/null run --rm backend pytest tests/unit_test.py
+          docker-compose --env-file .env run --rm backend pytest tests/unit_test.py
 
       - name: Run Cypress end-to-end tests
         run: |
-          docker-compose --env-file /dev/null run --rm frontend npx cypress run
+          docker-compose run --rm frontend npx cypress run
 
       - name: Stop services
         if: always()
@@ -103,12 +108,16 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y docker-compose
 
+      - name: Create an empty .env file
+        run: |
+          touch .env
+
       - name: Build Docker images
         env:
           MLFLOW_TRACKING_USERNAME: ${{ secrets.MLFLOW_TRACKING_USERNAME }}
           MLFLOW_TRACKING_PASSWORD: ${{ secrets.MLFLOW_TRACKING_PASSWORD }}
         run: |
-          docker-compose --env-file /dev/null -f docker-compose.yml build
+          docker-compose --env-file .env -f docker-compose.yml build
 
       - name: Push Docker images to DockerHub
         run: |
