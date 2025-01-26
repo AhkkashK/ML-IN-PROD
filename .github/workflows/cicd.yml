@@ -68,7 +68,6 @@ jobs:
           
       - name: Install Cypress
         run: |
-          cd tests
           npm install cypress --save-dev
 
       - name: Run Cypress end-to-end tests
