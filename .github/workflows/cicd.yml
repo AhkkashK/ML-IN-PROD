@@ -23,10 +23,11 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y docker-compose
+          docker-compose version  # Vérification que docker-compose est installé
 
-      - name: Debug Docker file system
+      - name: Debug paths (optional)
         run: |
-          docker-compose run --rm backend ls -R /app
+          docker-compose run --rm backend bash -c "echo $PYTHONPATH && ls -R /app"
 
       - name: Run integration tests
         run: |
@@ -44,7 +45,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y docker-compose
-          docker-compose version
+          docker-compose version  # Vérification que docker-compose est installé
 
       - name: Start services with Docker Compose
         run: |
@@ -56,7 +57,7 @@ jobs:
 
       - name: Run unit tests
         run: |
-          docker-compose exec backend pytest /app/tests/unit_test.py
+          docker-compose exec backend bash -c "PYTHONPATH=/app pytest /app/tests/unit_test.py"
 
       - name: Run Cypress end-to-end tests
         run: |
