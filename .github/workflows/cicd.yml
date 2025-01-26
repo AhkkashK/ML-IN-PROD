@@ -40,7 +40,8 @@ jobs:
           git push origin staging
 
   staging-tests:
-    if: github.ref == 'refs/heads/staging'
+    needs: integration-tests 
+    if: github.ref == 'refs/heads/staging' || github.event_name == 'push'
     runs-on: ubuntu-latest
 
     steps:
