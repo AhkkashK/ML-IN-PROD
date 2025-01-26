@@ -56,11 +56,11 @@ jobs:
 
       - name: Start services with Docker Compose
         run: |
-          docker-compose up --build
+          docker-compose up -d
 
       - name: Wait for services to be ready
         run: |
-          npx wait-on http://localhost:3000 http://localhost:8000
+          npx wait-on http://localhost:3000 http://0.0.0.0:8000
 
       - name: Run unit tests
         run: |
