@@ -5,3 +5,6 @@ mlflow
 scikit-learn
 pytest
 nltk
+httpx
+
+
