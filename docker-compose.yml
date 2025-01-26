@@ -9,8 +9,6 @@ services:
     volumes:
       - ./backend:/app  
       - ./tests:/app/tests
-    env_file:
-      - .env  
     
   frontend:
     build:
