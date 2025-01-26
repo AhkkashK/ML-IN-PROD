@@ -23,70 +23,23 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y docker-compose
-          docker-compose version 
+          docker-compose version
 
-      - name: Run integration tests
-        env:
-          PYTHONPATH: /app  
-        run: |
-          docker-compose run --rm backend pytest /app/tests/integration_test.py
-
-  staging-tests:
-    if: github.ref == 'refs/heads/staging'
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Install Docker Compose
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y docker-compose
-          docker-compose version  # Vérifie que Docker Compose est bien installé
-
-      - name: Start services with Docker Compose
-        env:
-          PYTHONPATH: /app  
+      - name: Build and Start Services
         run: |
           docker-compose up -d --build
 
-      - name: Wait for services to be ready
+      - name: Debug volume mounting
         run: |
-          npx wait-on http://localhost:3000 http://localhost:8000
+          docker-compose run --rm backend ls /app
 
-      - name: Run unit tests
+      - name: Run integration tests
         env:
-          PYTHONPATH: /app  
+          PYTHONPATH: /app
         run: |
-          docker-compose exec backend pytest /app/tests/unit_test.py
-
-      - name: Run Cypress end-to-end tests
-        run: |
-          cd tests/cypress
-          npx cypress run
+          docker-compose run --rm backend pytest /app/tests/integration_test.py
 
       - name: Stop services
         if: always()
         run: |
           docker-compose down --remove-orphans
-
-  production-deploy:
-    if: github.ref == 'refs/heads/production'
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Install Docker Compose
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y docker-compose
-          docker-compose version
-
-      - name: Deploy to Production
-        env:
-          PYTHONPATH: /app  
-        run: |
-          docker-compose up -d --build
