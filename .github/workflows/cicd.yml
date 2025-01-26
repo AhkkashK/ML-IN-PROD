@@ -29,6 +29,7 @@ jobs:
           cd backend
           pip install -r requirements.txt
           pip install pytest
+          pip install httpx
 
       - name: Run integration tests
         run: |
