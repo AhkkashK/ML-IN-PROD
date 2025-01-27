@@ -1,12 +1,14 @@
 name: CI/CD Pipeline
 
+permissions:
+  contents: write
+
 on:
   pull_request:
     branches:
       - develop
   push:
     branches:
-      - develop
       - staging
       - main
 
@@ -16,6 +18,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Debug info
+        run: |
+          echo "Event name: ${{ github.event_name }}"
+          echo "Base ref: ${{ github.base_ref }}"
+          echo "Ref: ${{ github.ref }}"
       - name: Checkout code
         uses: actions/checkout@v3
 
@@ -23,25 +30,21 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y docker-compose
-          docker-compose version  # Verify docker-compose is installed
+          docker-compose version
+
       - name: Run integration tests
         run: |
           docker-compose run --rm backend pytest /tests/integration_test.py
-      - name: Merge develop into staging
-        if: success()
-        run: |
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-          git fetch origin
-          git checkout staging
-          git merge origin/develop --no-ff --commit -m "CI: Merge develop into staging after integration tests"
-          git push origin staging
+
   staging-tests:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/staging'
     runs-on: ubuntu-latest
-    needs: integration-tests
-    if: ${{ always() }}
 
     steps:
+      - name: Debug info
+        run: |
+          echo "Event name: ${{ github.event_name }}"
+          echo "Ref: ${{ github.ref }}"
       - name: Checkout code
         uses: actions/checkout@v3
 
@@ -62,14 +65,6 @@ jobs:
       - name: Start services with Docker Compose
         run: |
           docker-compose up -d
-      - name: Wait for backend to be ready
-        run: |
-          npx wait-on http://localhost:3000
-
-      - name: List Cypress Files
-        run: |
-          echo "Listing all files in the Cypress directory:"
-          ls -R tests/cypress
 
       - name: Run Cypress end-to-end tests
         uses: cypress-io/github-action@v5
@@ -80,15 +75,37 @@ jobs:
 
       - name: Stop services
         if: always()
+        run: docker-compose down
+
+  deploy-to-dockerhub:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Debug info
         run: |
-          docker-compose down
-      
-      - name: Merge staging into main
-        if: success()
+          echo "Event name: ${{ github.event_name }}"
+          echo "Ref: ${{ github.ref }}"
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Log in to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Install Docker Compose
         run: |
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-          git fetch origin
-          git checkout main
-          git merge origin/staging --no-ff --commit -m "CI: Merge staging into main after unit and E2E tests"
-          git push origin main
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
+          docker-compose version
+    
+      - name: Build services with Docker Compose
+        run: |
+          docker-compose build
+
+      - name: Push images
+        run: |
+          docker push ${{ secrets.DOCKER_USERNAME }}/classification-spam:backend-latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/classification-spam:frontend-latest
