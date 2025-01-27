@@ -2,20 +2,17 @@ version: "3.9"
 
 services:
   backend:
-    build:
-      context: ./backend
+    image: akhkanda/classification-spam-app:backend
     ports:
-      - "8000:8000"  
+      - "8000:8000"
     volumes:
-      - ./backend:/backend 
+      - ./backend:/backend
       - ./tests:/tests
-    
-  frontend:
-    build:
-      context: ./frontend
-    ports:
-      - "3000:3000" 
-    volumes:
-      - ./frontend:/app  
-      - /app/node_modules  
 
+  frontend:
+    image: akhkanda/classification-spam-app:frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
