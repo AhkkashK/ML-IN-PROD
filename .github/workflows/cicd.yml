@@ -122,17 +122,13 @@ jobs:
     - name: Build services with Docker Compose
       run: |
         docker-compose build
-    
-    - name: List Docker images
-      run: docker images
 
     - name: Tag images
       run: |
-        docker tag backend ${{ secrets.DOCKER_USERNAME }}/classification-spam:backend-latest
-        docker tag frontend ${{ secrets.DOCKER_USERNAME }}/classification-spam:frontend-latest
-    
+        docker tag ml-in-prod_backend:latest ${{ secrets.DOCKER_USERNAME }}/classification-spam:backend-latest
+        docker tag ml-in-prod_frontend:latest ${{ secrets.DOCKER_USERNAME }}/classification-spam:frontend-latest
+
     - name: Push images
       run: |
         docker push ${{ secrets.DOCKER_USERNAME }}/classification-spam:backend-latest
         docker push ${{ secrets.DOCKER_USERNAME }}/classification-spam:frontend-latest
-
