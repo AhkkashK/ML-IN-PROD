@@ -1,5 +1,8 @@
 name: CI/CD Pipeline
 
+permissions:
+  contents: write
+
 on:
   pull_request:
     branches:
@@ -36,6 +39,8 @@ jobs:
           git checkout staging
           git merge origin/develop --no-ff --commit -m "CI: Merge develop into staging after integration tests"
           git push origin staging
+  
+  
   staging-tests:
     runs-on: ubuntu-latest
     needs: integration-tests
