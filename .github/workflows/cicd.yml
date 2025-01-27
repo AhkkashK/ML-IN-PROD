@@ -112,5 +112,15 @@ jobs:
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
+    
+    - name: Push Backend Image
+      run: |
+        docker tag backend ${{ secrets.DOCKER_USERNAME }}/classification-spam-backend:latest
+        docker push ${{ secrets.DOCKER_USERNAME }}/classification-spam-backend:latest
 
+    - name: Push Frontend Image
+      run: |
+        docker tag frontend ${{ secrets.DOCKER_USERNAME }}/classification-spam-frontend:latest
+        docker push ${{ secrets.DOCKER_USERNAME }}/classification-spam-frontend:latest
+    
     
