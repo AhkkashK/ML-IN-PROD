@@ -112,28 +112,3 @@ jobs:
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
-
-    - name: Install Docker Compose
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y docker-compose
-          docker-compose version
-    
-    - name: Build services with Docker Compose
-        run: |
-          docker-compose build
-
-    - name: Tag images
-        run: |
-          docker tag backend:latest ${{ secrets.DOCKER_USERNAME }}/classification-spam:backend-latest
-          docker tag frontend:latest ${{ secrets.DOCKER_USERNAME }}/classification-spam:frontend-latest
-    
-    - name: Push images
-        run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/classification-spam:backend-latest
-          docker push ${{ secrets.DOCKER_USERNAME }}/classification-spam:frontend-latest
-
-
-    
-    
- 
