@@ -30,16 +30,15 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y docker-compose
-          docker-compose version  # Verify docker-compose is installed
+          docker-compose version
 
       - name: Run integration tests
         run: |
           docker-compose run --rm backend pytest /tests/integration_test.py
 
   staging-tests:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/staging'
     runs-on: ubuntu-latest
-    needs: integration-tests
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/staging') && needs.integration-tests.result == 'success'
 
     steps:
       - name: Debug info
@@ -74,10 +73,13 @@ jobs:
           config-file: tests/cypress.config.js
           browser: chrome
 
+      - name: Stop services
+        if: always()
+        run: docker-compose down
+
   deploy-to-dockerhub:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    needs: staging-tests
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/main') && needs.staging-tests.result == 'success'
 
     steps:
       - name: Debug info
