@@ -127,4 +127,9 @@ jobs:
       run: |
         docker tag backend:latest ${{ secrets.DOCKER_USERNAME }}/classification-spam:backend-latest
         docker tag frontend:latest ${{ secrets.DOCKER_USERNAME }}/classification-spam:frontend-latest
+    
+    - name: Push images
+      run: |
+        docker push ${{ secrets.DOCKER_USERNAME }}/classification-spam:backend-latest
+        docker push ${{ secrets.DOCKER_USERNAME }}/classification-spam:frontend-latest
 
