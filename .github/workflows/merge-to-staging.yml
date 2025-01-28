@@ -1,0 +1,23 @@
+name: Merge to Staging
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  merge-to-staging:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Merge develop into staging
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git fetch origin
+          git checkout staging
+          git merge origin/develop -X theirs --no-ff --allow-unrelated-histories --commit -m "Merge develop into staging"
+          git push origin staging
