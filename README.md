@@ -1,6 +1,6 @@
 
 
-# **Spam Classifier**
+# **Spam Classifie**
 
 A project for classifying messages as **spam** or **non-spam**. This system leverages modern technologies such as **FastAPI**, **React.js**, and data pipelines managed with **DVC** connected to **Google Drive**. The entire project is containerized using **Docker**, with continuous integration handled via **GitHub Actions**.
 
