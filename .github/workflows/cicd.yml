@@ -55,7 +55,7 @@ jobs:
           git config user.email "actions@github.com"
           git fetch origin
           git checkout main
-          git merge origin/staging --no-ff --commit -m "Merge staging into main"
+          git merge origin/staging --no-ff --allow-unrelated-histories --commit -m "Merge staging into main"
           git push origin main
 
   integration-tests:
@@ -90,7 +90,7 @@ jobs:
           git config user.email "actions@github.com"
           git fetch origin
           git checkout staging
-          git merge origin/develop --no-ff --commit -m "Merge develop into staging"
+          git merge origin/develop --no-ff --allow-unrelated-histories --commit -m "Merge develop into staging"
           git push origin staging
 
   deploy:
