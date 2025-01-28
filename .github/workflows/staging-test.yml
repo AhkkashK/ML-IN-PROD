@@ -4,11 +4,6 @@ on:
   push:
     branches:
       - staging
-  workflow_run:
-    workflows:
-      - Integration Tests
-    types:
-      - completed
 
 jobs:
   staging-tests:
