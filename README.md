@@ -1,4 +1,5 @@
 
+
 # **Spam Classifie**
 
 A project for classifying messages as **spam** or **non-spam**. This system leverages modern technologies such as **FastAPI**, **React.js**, and data pipelines managed with **DVC** connected to **Google Drive**. The entire project is containerized using **Docker**, with continuous integration handled via **GitHub Actions**.
@@ -34,4 +35,3 @@ Before starting, ensure you have the following tools installed:
 The project is designed to run seamlessly using Docker Compose. Follow these steps to get started:
 
 Clone the repo and then do the docker-compose up --build
-
