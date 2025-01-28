@@ -1,0 +1,53 @@
+name: Staging Tests
+
+on:
+  push:
+    branches:
+      - staging
+
+jobs:
+  staging-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
+          docker-compose version
+
+      - name: Install dependencies
+        run: npm install cypress
+
+      - name: Install GPU dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgbm-dev libnss3 x11-utils
+
+      - name: Start services with Docker Compose
+        run: |
+          docker-compose up -d
+
+      - name: Run Cypress end-to-end tests
+        uses: cypress-io/github-action@v5
+        with:
+          spec: tests/cypress/e2e/**/*.cy.js
+          config-file: tests/cypress.config.js
+          browser: chrome
+
+      - name: Stop services
+        if: always()
+        run: docker-compose down
+
+      - name: Merge staging into main
+        if: success()
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git fetch origin
+          git checkout main
+          git merge origin/staging --no-ff --allow-unrelated-histories --commit -m "Merge staging into main"
+          git push origin main
