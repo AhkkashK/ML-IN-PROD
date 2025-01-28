@@ -1,0 +1,28 @@
+name: Merge to Main
+
+on:
+  workflow_run:
+    workflows:
+      - Staging Tests
+    types:
+      - completed
+
+jobs:
+  merge-to-main:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure Git
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+
+      - name: Merge staging into main
+        run: |
+          git fetch origin
+          git checkout main
+          git merge origin/staging -X theirs --no-ff --allow-unrelated-histories --commit -m "Merge staging into main"
+          git push origin main
