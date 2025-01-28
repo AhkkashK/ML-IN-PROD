@@ -1,9 +1,11 @@
 name: Staging Tests
 
 on:
-  push:
-    branches:
-      - staging
+  workflow_run:
+    workflows:
+      - Merge to Staging
+    types:
+      - completed
 
 jobs:
   staging-tests:
@@ -41,15 +43,3 @@ jobs:
       - name: Stop services
         if: always()
         run: docker-compose down
-
-      - name: Merge staging into main
-        if: success()
-        run: |
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-          git fetch origin
-          git checkout main
-          git merge origin/staging -X theirs --no-ff --allow-unrelated-histories --commit -m "Merge staging into main"
-          git push origin main
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
