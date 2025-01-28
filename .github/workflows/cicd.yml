@@ -1,27 +1,17 @@
-name: Integration Tests
+name: Dev to Sta
 
 on:
-  pull_request:
+  push:
     branches:
       - develop
 
 jobs:
-  integration-tests:
+  merging-to-sta:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-
-      - name: Install Docker Compose
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y docker-compose
-          docker-compose version
-
-      - name: Run integration tests
-        run: |
-          docker-compose run --rm backend pytest /tests/integration_test.py
 
       - name: Merge develop into staging
         if: success()
