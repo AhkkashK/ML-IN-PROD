@@ -1,9 +1,11 @@
 name: Deploy to DockerHub
 
 on:
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows:
+      - Merge to Main
+    types:
+      - completed
 
 jobs:
   deploy:
