@@ -1,0 +1,45 @@
+name: Integration Tests
+
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - develop
+
+jobs:
+  integration-tests:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
+          docker-compose version
+
+      - name: Run integration tests
+        run: |
+          docker-compose run --rm backend pytest /tests/integration_test.py
+
+  merge-to-staging:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Merge develop into staging
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git fetch origin
+          git checkout staging
+          git merge origin/develop --no-ff --commit -m "Merge develop into staging"
+          git push origin staging
