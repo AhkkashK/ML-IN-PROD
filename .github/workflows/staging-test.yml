@@ -51,3 +51,5 @@ jobs:
           git checkout main
           git merge origin/staging -X theirs --no-ff --allow-unrelated-histories --commit -m "Merge staging into main"
           git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
