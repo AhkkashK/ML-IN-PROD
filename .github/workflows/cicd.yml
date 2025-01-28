@@ -1,12 +1,12 @@
-name: Integration Tests
+name: Dev to Sta
 
 on:
-  pull_request:
+  push:
     branches:
       - develop
 
 jobs:
-  integration-tests:
+  merging-to-sta:
     runs-on: ubuntu-latest
 
     steps:
@@ -22,3 +22,4 @@ jobs:
       - name: Run integration tests
         run: |
           docker-compose run --rm backend pytest /tests/integration_test.py
+
