@@ -40,6 +40,6 @@ Clone the repo and then do the docker-compose up --build
 
 https://imperial-nessi-kayakobeme-fee332e9.koyeb.app/
 
-## **Project made by **
+## **Project made by**
 
 Emmanuel, Ahkkash and Zayed
